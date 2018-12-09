@@ -1,5 +1,11 @@
+
+// Author : Ethan Brugger
+// UARK ID: 010773000
+// Class  : CSCE - 3613
+
 import java.util.*;
 import java.util.concurrent.Semaphore;
+import java.io.PrintStream;
 
 public class PC extends Thread {
 
@@ -13,7 +19,7 @@ public class PC extends Thread {
 
     @Override
     public void run() {
-        do {
+        for (int i = 0; i < 100; i++) {
             double sleepTime = Math.random() * (500) + 1;
             int num = rand.nextInt(randomSeed);
             try {
@@ -29,10 +35,18 @@ public class PC extends Thread {
             } catch (Exception e) {
                 // TODO: handle exception
             }
-        } while (true);
+        }
     }
 
     public static void main(String[] args) {
+        // Set output to external file
+        try {
+            PrintStream fileOut = new PrintStream("./output.txt");
+            System.setOut(fileOut);
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
+
         // Get command line arguments (cli)
         int sleepTime = Integer.parseInt(args[0]);
         int numProducerThreads = Integer.parseInt(args[1]);
@@ -66,7 +80,6 @@ public class PC extends Thread {
 
         // Exit
         System.exit(0);
-
     }
 }
 
@@ -97,11 +110,6 @@ class Buffer {
             buffer[in] = item;
             in = (in + 1) % BUFFER_SIZE;
 
-            // if (count == BUFFER_SIZE)
-            // System.out.println("Producer Entered " + item + " Buffer FULL");
-            // else
-            // System.out.println("Producer Entered " + item + " Buffer Size = " + count);
-
             mutex.release();
             empty.release();
         } catch (Exception e) {
@@ -120,11 +128,6 @@ class Buffer {
             --count;
             item = buffer[out];
             out = (out + 1) % BUFFER_SIZE;
-
-            // if (count == 0)
-            // System.out.println("Consumer Consumed " + item + " Buffer EMPTY");
-            // else
-            // System.out.println("Consumer Consumed " + item + " Buffer Size = " + count);
 
             mutex.release();
             full.release();
